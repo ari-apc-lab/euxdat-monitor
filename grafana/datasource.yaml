@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sample-grafana-datasource
+  labels:
+      grafana_datasource: "true"
+data:
+  datasource.yaml: |-
+     apiVersion: 1
+     datasources:
+     - name: Prometheus-server
+       type: prometheus
+       access: proxy
+       orgId: 1
+       # get this url from the mygrafana service: 
+       # kubectl get svc mygrafana
+       url: http://10.110.12.254:9090
+       isDefault: true
+

@@ -1,0 +1,79 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: prometheus-deployment
+  labels: 
+    app: prometheus
+    purpose: example
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: prometheus
+      purpose: example
+  template:
+    metadata:
+      labels:
+        app: prometheus
+        purpose: example
+    spec:
+      containers:
+      - name: prometheus-example
+        image: prom/prometheus
+        volumeMounts:
+          - name: config-volume
+            mountPath: /etc/prometheus/prometheus.yml
+            subPath: prometheus.yml
+          - name: rules-general
+            mountPath: /etc/prometheus/rules/generalrules.yaml
+            subPath: generalrules.yaml
+        ports:
+        - containerPort: 9090
+      volumes:
+        - name: config-volume
+          configMap:
+            name: prometheus-example-cm
+        - name: rules-general
+          configMap:
+            name: prometheus-rules-general
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-example-service
+spec:
+  selector:
+    app: prometheus
+    purpose: example
+  ports:
+  - name: promui
+    protocol: TCP
+    port: 9090
+    targetPort: 9090
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod-cluster-issuer
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/proxy-body-size: 300m
+  name: prometheus-ingress
+  namespace: default
+spec:
+  rules:
+  - host: prometheus.test.euxdat.eu
+    http:
+      paths:
+      - backend:
+          serviceName: prometheus-example-service
+          servicePort: 9090
+        path: /
+  tls:
+  - hosts:
+    - prometheus.test.euxdat.eu
+    secretName: prometheus.test.euxdat.eu
+
+

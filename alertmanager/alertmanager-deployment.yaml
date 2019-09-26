@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alertmanager-deployment
+  labels:
+     app: alertmanager
+spec:
+   replicas: 1
+   selector:
+     matchLabels:
+       app: alertmanager
+   template:
+      metadata:
+         labels:
+           app: alertmanager
+      spec:
+        containers:
+         - name: alertmanager
+           image: prom/alertmanager
+           volumeMounts:
+              - name: alertmanager-config
+                mountPath: /etc/alertmanager/alertmanager.yml
+                subPath: alertmanager.yml
+           ports:
+           - containerPort: 9093
+        volumes:
+         - name: alertmanager-config
+           configMap:
+             name: alertmanager-config
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: alertmanager-service
+spec:
+  selector:
+    app: alertmanager
+  ports:
+  - name: alertui
+    protocol: TCP
+    port: 9093
+    targetPort: 9093
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod-cluster-issuer
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/proxy-body-size: 300m
+  name: alertmanager-ingress
+  namespace: default
+spec:
+  rules:
+  - host: alertmanager.test.euxdat.eu
+    http:
+      paths:
+      - backend:
+          serviceName: alertmanager-service
+          servicePort: 9093
+        path: /
+  tls:
+  - hosts:
+    - alertmanager.test.euxdat.eu
+    secretName: alertmanager.test.euxdat.eu
+

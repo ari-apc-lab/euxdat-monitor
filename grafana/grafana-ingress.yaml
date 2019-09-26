@@ -1,0 +1,23 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod-cluster-issuer
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/proxy-body-size: 300m
+  name: grafana-ingress
+  namespace: default
+spec:
+  rules:
+  - host: grafana.test.euxdat.eu
+    http:
+      paths:
+      - backend:
+          serviceName: euxdat-grafana
+          servicePort: 3000
+        path: /
+  tls:
+  - hosts:
+    - grafana.test.euxdat.eu
+    secretName: grafana.test.euxdat.eu
+
