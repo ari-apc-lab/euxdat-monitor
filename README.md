@@ -1,8 +1,8 @@
 # euxdat-monitor
 
-This project contains files and information copied from ![Kubernetes Monitoring with Prometheus -The ultimate guide](https://sysdig.com/blog/kubernetes-monitoring-prometheus/)
+This project contains files and information copied from [Kubernetes Monitoring with Prometheus -The ultimate guide](https://sysdig.com/blog/kubernetes-monitoring-prometheus/)
 
-Please look at ![PrometheusBundle](https://github.com/ari-apc-lab/euxdat-monitor/blob/master/docs/PrometheusBundle.docx) for information regarding installing, configuring, and using this software.
+Please look at ./docs/PrometheusBundle.docx for information regarding installing, configuring, and using this software.
 
 ## License
 
